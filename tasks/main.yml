@@ -1,0 +1,9 @@
+- name: Update authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ item.user }}"
+    key: "{{ ssh_keys | selectattr('owner', 'in', item.key_owners) | map(attribute='keys') | flatten | join('\n') }}"
+    exclusive: "{{ item.exclusive | default(ssh_keys_exclusive) }}"
+    state: "{{ item.state | default(ssh_keys_state) }}"
+  loop: "{{ ssh_keys_authorized }}"
+  loop_control:
+    label: "{{ item.user }}"
